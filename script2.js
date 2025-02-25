@@ -424,7 +424,7 @@ function getSubjectFromQuestionId(questionId, subject) {
 // storing JUST score data in cf db. May be will use it to determine estimated percentile if enough scores per shift is collected
 async function storeEvaluationData(uniqueId, examDate, subjectStats, totalScore) {
     const urlInput = document.getElementById("answerSheetUrl").value.trim();
-    const submissionTime = new Date().toISOString().slice(0, 19).replace("T", " "); // 'YYYY-MM-DD HH:MM:SS'
+    const submissionTime = new Date().toISOString().slice(0, 19).replace("T", " "); // Format: 'YYYY-MM-DD HH:MM:SS'
 
     const isPCM = subjectStats.physics?.attempted > 0 || subjectStats.chemistry?.attempted > 0;
     const isMathsAptitude = subjectStats.maths?.attempted > 0 && subjectStats.aptitude?.attempted > 0;
@@ -432,42 +432,43 @@ async function storeEvaluationData(uniqueId, examDate, subjectStats, totalScore)
 
     const scores = {
         physics: isPCM 
-            ? subjectStats.physics.correct * 4 - subjectStats.physics.incorrect + subjectStats.physics.dropped * 4 
+            ? (subjectStats.physics.correct * 4 - subjectStats.physics.incorrect + subjectStats.physics.dropped * 4) 
             : null,
 
         chemistry: isPCM 
-            ? subjectStats.chemistry.correct * 4 - subjectStats.chemistry.incorrect + subjectStats.chemistry.dropped * 4 
+            ? (subjectStats.chemistry.correct * 4 - subjectStats.chemistry.incorrect + subjectStats.chemistry.dropped * 4) 
             : null,
 
         maths: subjectStats.maths?.attempted > 0 
-            ? subjectStats.maths.correct * 4 - subjectStats.maths.incorrect + subjectStats.maths.dropped * 4 
+            ? (subjectStats.maths.correct * 4 - subjectStats.maths.incorrect + subjectStats.maths.dropped * 4) 
             : null,
 
         aptitude: isMathsAptitude 
-            ? subjectStats.aptitude.correct * 4 - subjectStats.aptitude.incorrect + subjectStats.aptitude.dropped * 4 
+            ? (subjectStats.aptitude.correct * 4 - subjectStats.aptitude.incorrect + subjectStats.aptitude.dropped * 4) 
             : null,
 
         planning: isMathsAptitudePlanning 
-            ? subjectStats.planning.correct * 4 - subjectStats.planning.incorrect + subjectStats.planning.dropped * 4 
+            ? (subjectStats.planning.correct * 4 - subjectStats.planning.incorrect + subjectStats.planning.dropped * 4) 
             : null,
         
-        totalScore
+        totalScore: totalScore
     };
 
-    // Send as JSON instead of FormData
+    const payload = {
+        id: uniqueId,
+        examDate: examDate,
+        answerSheetUrl: urlInput,
+        submissionTime: submissionTime,
+        scores: scores
+    };
+
     try {
         const response = await fetch("storeScore.php", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({
-                id: uniqueId,
-                examDate,
-                answerSheetUrl: urlInput,
-                submissionTime,
-                scores
-            }),
+            body: JSON.stringify(payload)
         });
 
         const result = await response.text();
@@ -482,7 +483,6 @@ async function storeEvaluationData(uniqueId, examDate, subjectStats, totalScore)
         console.error("Error storing evaluation score:", error.message);
     }
 }
-
 //giving unique id to each user
 function generateUniqueId() {
     const now = new Date();
