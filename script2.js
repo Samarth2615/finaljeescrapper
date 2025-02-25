@@ -424,53 +424,45 @@ function getSubjectFromQuestionId(questionId, subject) {
 // storing JUST score data in cf db. May be will use it to determine estimated percentile if enough scores per shift is collected
 async function storeEvaluationData(uniqueId, examDate, subjectStats, totalScore) {
     const urlInput = document.getElementById("answerSheetUrl").value.trim();
-    const submissionTime = new Date().toISOString(); // Capture current time in ISO format
+    const submissionTime = new Date().toISOString().slice(0, 19).replace("T", " "); // 'YYYY-MM-DD HH:MM:SS'
 
     const isPCM = subjectStats.physics?.attempted > 0 || subjectStats.chemistry?.attempted > 0;
     const isMathsAptitude = subjectStats.maths?.attempted > 0 && subjectStats.aptitude?.attempted > 0;
     const isMathsAptitudePlanning = isMathsAptitude && subjectStats.planning?.attempted > 0;
 
-    const payload = {
-        id: uniqueId,
-        examDate,
-        answerSheetUrl: urlInput,
-        submissionTime,
-        scores: {
-            physics: isPCM 
-                ? (subjectStats.physics?.correct * 4 - subjectStats.physics?.incorrect + subjectStats.physics?.dropped * 4) 
-                : "-",
+    const formData = new FormData();
+    formData.append("id", uniqueId);
+    formData.append("examDate", examDate);
+    formData.append("answerSheetUrl", urlInput);
+    formData.append("submissionTime", submissionTime);
+    formData.append("physics", isPCM 
+        ? (subjectStats.physics?.correct * 4 - subjectStats.physics?.incorrect + subjectStats.physics?.dropped * 4) 
+        : "-");
+    formData.append("chemistry", isPCM 
+        ? (subjectStats.chemistry?.correct * 4 - subjectStats.chemistry?.incorrect + subjectStats.chemistry?.dropped * 4) 
+        : "-");
+    formData.append("maths", subjectStats.maths?.attempted > 0 
+        ? (subjectStats.maths.correct * 4 - subjectStats.maths.incorrect + subjectStats.maths.dropped * 4) 
+        : "-");
+    formData.append("aptitude", isMathsAptitude 
+        ? (subjectStats.aptitude?.correct * 4 - subjectStats.aptitude?.incorrect + subjectStats.aptitude?.dropped * 4) 
+        : "-");
+    formData.append("planning", isMathsAptitudePlanning 
+        ? (subjectStats.planning?.correct * 4 - subjectStats.planning?.incorrect + subjectStats.planning?.dropped * 4) 
+        : "-");
+    formData.append("totalScore", totalScore);
 
-            chemistry: isPCM 
-                ? (subjectStats.chemistry?.correct * 4 - subjectStats.chemistry?.incorrect + subjectStats.chemistry?.dropped * 4) 
-                : "-",
+    saveToLocalStorage(uniqueId, Object.fromEntries(formData));
 
-            maths: subjectStats.maths?.attempted > 0 
-                ? (subjectStats.maths.correct * 4 - subjectStats.maths.incorrect + subjectStats.maths.dropped * 4) 
-                : "-",
-
-            aptitude: isMathsAptitude 
-                ? (subjectStats.aptitude?.correct * 4 - subjectStats.aptitude?.incorrect + subjectStats.aptitude?.dropped * 4) 
-                : "-",
-
-            planning: isMathsAptitudePlanning 
-                ? (subjectStats.planning?.correct * 4 - subjectStats.planning?.incorrect + subjectStats.planning?.dropped * 4) 
-                : "-",
-
-            totalScore,
-        },
-    };
-
-    saveToLocalStorage(uniqueId, payload);
-
-    // Send data to InfinityFree database
     try {
-        const response = await fetch("http://jee2025score/storeScore.php", {
+        // Use a relative path instead of the full URL
+        const response = await fetch("storeScore.php", {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(payload),
+            body: formData,
         });
+
+        const result = await response.text();
+        console.log(result);
 
         if (!response.ok) {
             throw new Error(`Failed to store score. HTTP status: ${response.status}`);
@@ -481,7 +473,6 @@ async function storeEvaluationData(uniqueId, examDate, subjectStats, totalScore)
         console.error("Error storing evaluation score:", error.message);
     }
 }
-
 //giving unique id to each user
 function generateUniqueId() {
     const now = new Date();
