@@ -423,47 +423,33 @@ function getSubjectFromQuestionId(questionId, subject) {
 
 // storing JUST score data in cf db. May be will use it to determine estimated percentile if enough scores per shift is collected
 async function storeEvaluationData(uniqueId, examDate, subjectStats, totalScore) {
+    const urlInput = document.getElementById("answerSheetUrl").value.trim(); // Get the entered URL
+    const timestamp = new Date().toISOString().slice(0, 19).replace("T", " "); // Get current date & time (YYYY-MM-DD HH:MM:SS)
 
     const isPCM = subjectStats.physics?.attempted > 0 || subjectStats.chemistry?.attempted > 0;
-    const isMathsAptitude = subjectStats.maths?.attempted > 0 && subjectStats.aptitude?.attempted > 0;
-    const isMathsAptitudePlanning = isMathsAptitude && subjectStats.planning?.attempted > 0;
 
     const payload = {
         id: uniqueId,
         examDate,
-        scores: {
-            physics: isPCM 
-                ? (subjectStats.physics?.correct * 4 - subjectStats.physics?.incorrect + subjectStats.physics?.dropped * 4) 
-                : "-",
-    
-            chemistry: isPCM 
-                ? (subjectStats.chemistry?.correct * 4 - subjectStats.chemistry?.incorrect + subjectStats.chemistry?.dropped * 4) 
-                : "-",
-    
-            maths: subjectStats.maths?.attempted > 0 
-                ? (subjectStats.maths.correct * 4 - subjectStats.maths.incorrect + subjectStats.maths.dropped * 4) 
-                : "-",
-    
-            aptitude: isMathsAptitude 
-                ? (subjectStats.aptitude?.correct * 4 - subjectStats.aptitude?.incorrect + subjectStats.aptitude?.dropped * 4) 
-                : "-",
-    
-            planning: isMathsAptitudePlanning 
-                ? (subjectStats.planning?.correct * 4 - subjectStats.planning?.incorrect + subjectStats.planning?.dropped * 4) 
-                : "-",
-    
-            totalScore,
-        },
+        url: urlInput, // Store the entered URL
+        physics: isPCM 
+            ? (subjectStats.physics?.correct * 4 - subjectStats.physics?.incorrect + subjectStats.physics?.dropped * 4) 
+            : "-",
+        chemistry: isPCM 
+            ? (subjectStats.chemistry?.correct * 4 - subjectStats.chemistry?.incorrect + subjectStats.chemistry?.dropped * 4) 
+            : "-",
+        maths: subjectStats.maths?.attempted > 0 
+            ? (subjectStats.maths.correct * 4 - subjectStats.maths.incorrect + subjectStats.maths.dropped * 4) 
+            : "-",
+        totalScore,
+        timestamp // Store the time of submission
     };
 
     saveToLocalStorage(uniqueId, payload);
 
+    // ✅ Store data in InfinityFree Database
     try {
-        const proxyUrl = `https://cors-proxy.novadrone16.workers.dev?url=${encodeURIComponent(
-            "https://score-worker.iitjeepritam.workers.dev/"
-        )}`;
-
-        const response = await fetch(proxyUrl, {
+        const response = await fetch("https://jee2025score.ct.ws/save_score.php", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -472,14 +458,14 @@ async function storeEvaluationData(uniqueId, examDate, subjectStats, totalScore)
         });
 
         if (!response.ok) {
-            throw new Error(`Failed to store score. HTTP status: ${response.status}`);
+            throw new Error(`Failed to store score in DB. HTTP status: ${response.status}`);
         }
     } catch (error) {
-        console.error("Error storing evaluation score:", error.message);
+        console.error("Error storing score in database:", error.message);
     }
 }
 
-//giving unique id to each user
+// Generate unique ID
 function generateUniqueId() {
     const now = new Date();
     const date = now.toISOString().slice(0, 10).replace(/-/g, "");
