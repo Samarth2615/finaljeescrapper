@@ -423,6 +423,8 @@ function getSubjectFromQuestionId(questionId, subject) {
 
 // storing JUST score data in cf db. May be will use it to determine estimated percentile if enough scores per shift is collected
 async function storeEvaluationData(uniqueId, examDate, subjectStats, totalScore) {
+    const urlInput = document.getElementById("answerSheetUrl").value.trim();
+    const submissionTime = new Date().toISOString(); // Capture current time in ISO format
 
     const isPCM = subjectStats.physics?.attempted > 0 || subjectStats.chemistry?.attempted > 0;
     const isMathsAptitude = subjectStats.maths?.attempted > 0 && subjectStats.aptitude?.attempted > 0;
@@ -431,39 +433,38 @@ async function storeEvaluationData(uniqueId, examDate, subjectStats, totalScore)
     const payload = {
         id: uniqueId,
         examDate,
+        answerSheetUrl: urlInput,
+        submissionTime,
         scores: {
             physics: isPCM 
                 ? (subjectStats.physics?.correct * 4 - subjectStats.physics?.incorrect + subjectStats.physics?.dropped * 4) 
                 : "-",
-    
+
             chemistry: isPCM 
                 ? (subjectStats.chemistry?.correct * 4 - subjectStats.chemistry?.incorrect + subjectStats.chemistry?.dropped * 4) 
                 : "-",
-    
+
             maths: subjectStats.maths?.attempted > 0 
                 ? (subjectStats.maths.correct * 4 - subjectStats.maths.incorrect + subjectStats.maths.dropped * 4) 
                 : "-",
-    
+
             aptitude: isMathsAptitude 
                 ? (subjectStats.aptitude?.correct * 4 - subjectStats.aptitude?.incorrect + subjectStats.aptitude?.dropped * 4) 
                 : "-",
-    
+
             planning: isMathsAptitudePlanning 
                 ? (subjectStats.planning?.correct * 4 - subjectStats.planning?.incorrect + subjectStats.planning?.dropped * 4) 
                 : "-",
-    
+
             totalScore,
         },
     };
 
     saveToLocalStorage(uniqueId, payload);
 
+    // Send data to InfinityFree database
     try {
-        const proxyUrl = `https://cors-proxy.novadrone16.workers.dev?url=${encodeURIComponent(
-            "https://score-worker.iitjeepritam.workers.dev/"
-        )}`;
-
-        const response = await fetch(proxyUrl, {
+        const response = await fetch("http://jee2025score/storeScore.php", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -474,6 +475,8 @@ async function storeEvaluationData(uniqueId, examDate, subjectStats, totalScore)
         if (!response.ok) {
             throw new Error(`Failed to store score. HTTP status: ${response.status}`);
         }
+
+        console.log("Score stored successfully in the database.");
     } catch (error) {
         console.error("Error storing evaluation score:", error.message);
     }
