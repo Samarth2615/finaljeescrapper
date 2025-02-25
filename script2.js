@@ -430,35 +430,44 @@ async function storeEvaluationData(uniqueId, examDate, subjectStats, totalScore)
     const isMathsAptitude = subjectStats.maths?.attempted > 0 && subjectStats.aptitude?.attempted > 0;
     const isMathsAptitudePlanning = isMathsAptitude && subjectStats.planning?.attempted > 0;
 
-    const formData = new FormData();
-    formData.append("id", uniqueId);
-    formData.append("examDate", examDate);
-    formData.append("answerSheetUrl", urlInput);
-    formData.append("submissionTime", submissionTime);
-    formData.append("physics", isPCM 
-        ? (subjectStats.physics?.correct * 4 - subjectStats.physics?.incorrect + subjectStats.physics?.dropped * 4) 
-        : "-");
-    formData.append("chemistry", isPCM 
-        ? (subjectStats.chemistry?.correct * 4 - subjectStats.chemistry?.incorrect + subjectStats.chemistry?.dropped * 4) 
-        : "-");
-    formData.append("maths", subjectStats.maths?.attempted > 0 
-        ? (subjectStats.maths.correct * 4 - subjectStats.maths.incorrect + subjectStats.maths.dropped * 4) 
-        : "-");
-    formData.append("aptitude", isMathsAptitude 
-        ? (subjectStats.aptitude?.correct * 4 - subjectStats.aptitude?.incorrect + subjectStats.aptitude?.dropped * 4) 
-        : "-");
-    formData.append("planning", isMathsAptitudePlanning 
-        ? (subjectStats.planning?.correct * 4 - subjectStats.planning?.incorrect + subjectStats.planning?.dropped * 4) 
-        : "-");
-    formData.append("totalScore", totalScore);
+    const scores = {
+        physics: isPCM 
+            ? subjectStats.physics.correct * 4 - subjectStats.physics.incorrect + subjectStats.physics.dropped * 4 
+            : null,
 
-    saveToLocalStorage(uniqueId, Object.fromEntries(formData));
+        chemistry: isPCM 
+            ? subjectStats.chemistry.correct * 4 - subjectStats.chemistry.incorrect + subjectStats.chemistry.dropped * 4 
+            : null,
 
+        maths: subjectStats.maths?.attempted > 0 
+            ? subjectStats.maths.correct * 4 - subjectStats.maths.incorrect + subjectStats.maths.dropped * 4 
+            : null,
+
+        aptitude: isMathsAptitude 
+            ? subjectStats.aptitude.correct * 4 - subjectStats.aptitude.incorrect + subjectStats.aptitude.dropped * 4 
+            : null,
+
+        planning: isMathsAptitudePlanning 
+            ? subjectStats.planning.correct * 4 - subjectStats.planning.incorrect + subjectStats.planning.dropped * 4 
+            : null,
+        
+        totalScore
+    };
+
+    // Send as JSON instead of FormData
     try {
-        // Use a relative path instead of the full URL
         const response = await fetch("storeScore.php", {
             method: "POST",
-            body: formData,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                id: uniqueId,
+                examDate,
+                answerSheetUrl: urlInput,
+                submissionTime,
+                scores
+            }),
         });
 
         const result = await response.text();
@@ -473,6 +482,7 @@ async function storeEvaluationData(uniqueId, examDate, subjectStats, totalScore)
         console.error("Error storing evaluation score:", error.message);
     }
 }
+
 //giving unique id to each user
 function generateUniqueId() {
     const now = new Date();
