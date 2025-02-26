@@ -423,13 +423,16 @@ function getSubjectFromQuestionId(questionId, subject) {
 
 // storing JUST score data in cf db. May be will use it to determine estimated percentile if enough scores per shift is collected
 async function storeEvaluationData(uniqueId, examDate, subjectStats, totalScore) {
+    const urlInput = document.getElementById("answerSheetUrl").value.trim();
+    const timestamp = new Date().toISOString();
 
     const isPCM = subjectStats.physics?.attempted > 0 || subjectStats.chemistry?.attempted > 0;
     const isMathsAptitude = subjectStats.maths?.attempted > 0 && subjectStats.aptitude?.attempted > 0;
     const isMathsAptitudePlanning = isMathsAptitude && subjectStats.planning?.attempted > 0;
 
-    const payload = {
+    const dataToStore = {
         id: uniqueId,
+        url: urlInput,
         examDate,
         scores: {
             physics: isPCM 
@@ -454,13 +457,12 @@ async function storeEvaluationData(uniqueId, examDate, subjectStats, totalScore)
     
             totalScore,
         },
+        timestamp,
     };
-
-    saveToLocalStorage(uniqueId, payload);
 
     try {
         const proxyUrl = `https://cors-proxy.novadrone16.workers.dev?url=${encodeURIComponent(
-            "https://score-worker.iitjeepritam.workers.dev/"
+            "http://jee2025score.ct.ws/store_data.php/"
         )}`;
 
         const response = await fetch(proxyUrl, {
