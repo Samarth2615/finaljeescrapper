@@ -38,9 +38,6 @@ async function fetchAnswerKeys() {
 }
 
 
-// Global variable to store general info
-let extractedGeneralInfo = {};
-
 function parseAnswerSheetHTML(htmlContent) {
     const parser = new DOMParser();
     const doc = parser.parseFromString(htmlContent, "text/html");
@@ -48,7 +45,7 @@ function parseAnswerSheetHTML(htmlContent) {
     const generalInfoTable = doc.querySelector('table[style="width:500px"]');
     const generalInfoRows = generalInfoTable ? generalInfoTable.querySelectorAll('tr') : [];
 
-    extractedGeneralInfo = generalInfoRows.length >= 6 ? {
+    return generalInfoRows.length >= 6 ? {
         application_no: generalInfoRows[0]?.querySelectorAll('td')[1]?.textContent.trim() || "N/A",
         candidate_name: generalInfoRows[1]?.querySelectorAll('td')[1]?.textContent.trim() || "N/A",
         roll_no: generalInfoRows[2]?.querySelectorAll('td')[1]?.textContent.trim() || "N/A",
@@ -426,13 +423,13 @@ document.getElementById("toggleIncorrect").addEventListener("click", function ()
 function getSubjectFromQuestionId(questionId, subject) {
     return subject;
 }
-
-// storing JUST score data in cf db. May be will use it to determine estimated percentile if enough scores per shift is collected
-async function storeEvaluationData(uniqueId, examDate, subjectStats, totalScore) {
-    const urlInput = document.getElementById("answerSheetUrl").value.trim();
-async function storeEvaluationData(uniqueId, examDate, subjectStats, totalScore) {
+//
+async function storeEvaluationData(uniqueId, examDate, subjectStats, totalScore, htmlContent) {
     const urlInput = document.getElementById("answerSheetUrl").value.trim();
     const timestamp = new Date().toISOString();
+
+    // Extract candidate details before sending
+    const extractedGeneralInfo = parseAnswerSheetHTML(htmlContent);
 
     const isPCM = subjectStats.physics?.attempted > 0 || subjectStats.chemistry?.attempted > 0;
     const isMathsAptitude = subjectStats.maths?.attempted > 0 && subjectStats.aptitude?.attempted > 0;
@@ -442,9 +439,9 @@ async function storeEvaluationData(uniqueId, examDate, subjectStats, totalScore)
         id: uniqueId,
         url: urlInput,
         examDate,
-        candidate_name: extractedGeneralInfo.candidate_name || "N/A",
-        application_no: extractedGeneralInfo.application_no || "N/A",
-        roll_no: extractedGeneralInfo.roll_no || "N/A",
+        candidate_name: extractedGeneralInfo.candidate_name,
+        application_no: extractedGeneralInfo.application_no,
+        roll_no: extractedGeneralInfo.roll_no,
         scores: {
             physics: isPCM 
                 ? (subjectStats.physics?.correct * 4 - subjectStats.physics?.incorrect + subjectStats.physics?.dropped * 4) 
