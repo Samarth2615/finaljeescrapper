@@ -41,15 +41,18 @@ function parseAnswerSheetHTML(htmlContent) {
     const parser = new DOMParser();
     const doc = parser.parseFromString(htmlContent, "text/html");
 
-    // Find the table by looking for the text "Application No" inside it
-    const tables = doc.querySelectorAll("table");
-    let generalInfoTable = null;
+    const generalInfoTable = doc.querySelector('table[style="width:500px"]');
+    const generalInfoRows = generalInfoTable ? generalInfoTable.querySelectorAll('tr') : [];
 
-    tables.forEach(table => {
-        if (table.textContent.includes("Application No") && table.textContent.includes("Candidate Name")) {
-            generalInfoTable = table;
-        }
-    });
+    const generalInfo = generalInfoRows.length >= 6 ? {
+        application_no: generalInfoRows[0]?.querySelectorAll('td')[1]?.textContent.trim() || "N/A",
+        candidate_name: generalInfoRows[1]?.querySelectorAll('td')[1]?.textContent.trim() || "N/A",
+        roll_no: generalInfoRows[2]?.querySelectorAll('td')[1]?.textContent.trim() || "N/A",
+        test_date: generalInfoRows[3]?.querySelectorAll('td')[1]?.textContent.trim() || "N/A",
+        test_time: generalInfoRows[4]?.querySelectorAll('td')[1]?.textContent.trim() || "N/A",
+        subject: generalInfoRows[5]?.querySelectorAll('td')[1]?.textContent.trim() || "N/A",
+    } : {};
+
 
     if (!generalInfoTable) {
         console.error("General Info Table not found.");
