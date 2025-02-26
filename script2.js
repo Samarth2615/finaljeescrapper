@@ -37,7 +37,6 @@ async function fetchAnswerKeys() {
     }
 }
 
-
 function parseAnswerSheetHTML(htmlContent) {
     const parser = new DOMParser();
     const doc = parser.parseFromString(htmlContent, "text/html");
@@ -45,14 +44,12 @@ function parseAnswerSheetHTML(htmlContent) {
     const generalInfoTable = doc.querySelector('table[style="width:500px"]');
     const generalInfoRows = generalInfoTable ? generalInfoTable.querySelectorAll('tr') : [];
 
-    return generalInfoRows.length >= 6 ? {
-        application_no: generalInfoRows[0]?.querySelectorAll('td')[1]?.textContent.trim() || "N/A",
-        candidate_name: generalInfoRows[1]?.querySelectorAll('td')[1]?.textContent.trim() || "N/A",
-        roll_no: generalInfoRows[2]?.querySelectorAll('td')[1]?.textContent.trim() || "N/A",
+    const generalInfo = generalInfoRows.length >= 6 ? {
         test_date: generalInfoRows[3]?.querySelectorAll('td')[1]?.textContent.trim() || "N/A",
         test_time: generalInfoRows[4]?.querySelectorAll('td')[1]?.textContent.trim() || "N/A",
         subject: generalInfoRows[5]?.querySelectorAll('td')[1]?.textContent.trim() || "N/A",
     } : {};
+
 
     const questions = [];
     const questionPanels = doc.querySelectorAll('.question-pnl');
