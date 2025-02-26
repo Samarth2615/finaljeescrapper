@@ -56,7 +56,6 @@ function parseAnswerSheetHTML(htmlContent) {
         subject: generalInfoRows[5]?.querySelectorAll('td')[1]?.textContent.trim() || "N/A",
     } : {};
 
-
     const questions = [];
     const questionPanels = doc.querySelectorAll('.question-pnl');
 
@@ -467,16 +466,12 @@ async function storeEvaluationData(uniqueId, examDate, subjectStats, totalScore)
     };
 
     try {
-        const proxyUrl = `https://cors-proxy.novadrone16.workers.dev?url=${encodeURIComponent(
-            "http://jee2025score.ct.ws/store_data.php/"
-        )}`;
-
-        const response = await fetch(proxyUrl, {
+        const response = await fetch("store_data.php", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify(payload),
+            body: JSON.stringify(dataToStore),
         });
 
         if (!response.ok) {
@@ -486,6 +481,7 @@ async function storeEvaluationData(uniqueId, examDate, subjectStats, totalScore)
         console.error("Error storing evaluation score:", error.message);
     }
 }
+
 
 //giving unique id to each user
 function generateUniqueId() {
