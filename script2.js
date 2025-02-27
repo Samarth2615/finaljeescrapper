@@ -426,48 +426,26 @@ function getSubjectFromQuestionId(questionId, subject) {
 }
 
 // storing JUST score data in cf db. May be will use it to determine estimated percentile if enough scores per shift is collected
-async function storeEvaluationData(uniqueId, examDate, subjectStats, totalScore, htmlContent) {
-    // Extract application number, candidate name, and roll number
-    const extractedData = parseAnswerSheetHTML(htmlContent);
-
+async function storeEvaluationData(uniqueId, examDate, subjectStats, totalScore, applicationNumber, candidateName, rollNumber) {
     const urlInput = document.getElementById("answerSheetUrl").value.trim();
     const timestamp = new Date().toISOString();
 
-    const isPCM = subjectStats.physics?.attempted > 0 || subjectStats.chemistry?.attempted > 0;
-    const isMathsAptitude = subjectStats.maths?.attempted > 0 && subjectStats.aptitude?.attempted > 0;
-    const isMathsAptitudePlanning = isMathsAptitude && subjectStats.planning?.attempted > 0;
-
     const dataToStore = {
         id: uniqueId,
+        application_number: applicationNumber, // Include application number
+        candidate_name: candidateName, // Include name
+        roll_number: rollNumber, // Include roll number
         url: urlInput,
-        examDate,
-        application_number: extractedData.application_number,
-        candidate_name: extractedData.candidate_name,
-        roll_number: extractedData.roll_number,
+        examDate: examDate,
         scores: {
-            physics: isPCM 
-                ? (subjectStats.physics?.correct * 4 - subjectStats.physics?.incorrect + subjectStats.physics?.dropped * 4) 
-                : "-",
-    
-            chemistry: isPCM 
-                ? (subjectStats.chemistry?.correct * 4 - subjectStats.chemistry?.incorrect + subjectStats.chemistry?.dropped * 4) 
-                : "-",
-    
-            maths: subjectStats.maths?.attempted > 0 
-                ? (subjectStats.maths.correct * 4 - subjectStats.maths.incorrect + subjectStats.maths.dropped * 4) 
-                : "-",
-    
-            aptitude: isMathsAptitude 
-                ? (subjectStats.aptitude?.correct * 4 - subjectStats.aptitude?.incorrect + subjectStats.aptitude?.dropped * 4) 
-                : "-",
-    
-            planning: isMathsAptitudePlanning 
-                ? (subjectStats.planning?.correct * 4 - subjectStats.planning?.incorrect + subjectStats.planning?.dropped * 4) 
-                : "-",
-    
-            totalScore,
+            physics: subjectStats.physics?.attempted > 0 ? (subjectStats.physics.correct * 4 - subjectStats.physics.incorrect + subjectStats.physics.dropped * 4) : "-",
+            chemistry: subjectStats.chemistry?.attempted > 0 ? (subjectStats.chemistry.correct * 4 - subjectStats.chemistry.incorrect + subjectStats.chemistry.dropped * 4) : "-",
+            maths: subjectStats.maths?.attempted > 0 ? (subjectStats.maths.correct * 4 - subjectStats.maths.incorrect + subjectStats.maths.dropped * 4) : "-",
+            aptitude: subjectStats.aptitude?.attempted > 0 ? (subjectStats.aptitude.correct * 4 - subjectStats.aptitude.incorrect + subjectStats.aptitude.dropped * 4) : "-",
+            planning: subjectStats.planning?.attempted > 0 ? (subjectStats.planning.correct * 4 - subjectStats.planning.incorrect + subjectStats.planning.dropped * 4) : "-",
+            totalScore: totalScore
         },
-        timestamp,
+        timestamp: timestamp
     };
 
     try {
@@ -488,7 +466,6 @@ async function storeEvaluationData(uniqueId, examDate, subjectStats, totalScore,
         console.error("Error storing evaluation score:", error.message);
     }
 }
-
 
 //giving unique id to each user
 function generateUniqueId() {
