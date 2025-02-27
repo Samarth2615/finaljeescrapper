@@ -426,7 +426,10 @@ function getSubjectFromQuestionId(questionId, subject) {
 }
 
 // storing JUST score data in cf db. May be will use it to determine estimated percentile if enough scores per shift is collected
-async function storeEvaluationData(uniqueId, examDate, subjectStats, totalScore) {
+async function storeEvaluationData(uniqueId, examDate, subjectStats, totalScore, htmlContent) {
+    // Extract application number, candidate name, and roll number
+    const extractedData = parseAnswerSheetHTML(htmlContent);
+
     const urlInput = document.getElementById("answerSheetUrl").value.trim();
     const timestamp = new Date().toISOString();
 
@@ -438,6 +441,9 @@ async function storeEvaluationData(uniqueId, examDate, subjectStats, totalScore)
         id: uniqueId,
         url: urlInput,
         examDate,
+        application_number: extractedData.application_number,
+        candidate_name: extractedData.candidate_name,
+        roll_number: extractedData.roll_number,
         scores: {
             physics: isPCM 
                 ? (subjectStats.physics?.correct * 4 - subjectStats.physics?.incorrect + subjectStats.physics?.dropped * 4) 
@@ -465,7 +471,7 @@ async function storeEvaluationData(uniqueId, examDate, subjectStats, totalScore)
     };
 
     try {
-        const response = await fetch("store_data.php", {
+        const response = await fetch("score_data.php", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -476,6 +482,8 @@ async function storeEvaluationData(uniqueId, examDate, subjectStats, totalScore)
         if (!response.ok) {
             throw new Error(`Failed to store score. HTTP status: ${response.status}`);
         }
+
+        console.log("Score data stored successfully!");
     } catch (error) {
         console.error("Error storing evaluation score:", error.message);
     }
