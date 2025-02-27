@@ -429,27 +429,29 @@ function getSubjectFromQuestionId(questionId, subject) {
 }
 
 // storing JUST score data in cf db. May be will use it to determine estimated percentile if enough scores per shift is collected
-async function storeEvaluationData(uniqueId, examDate, subjectStats, totalScore, applicationNumber, candidateName, rollNumber) {
+async function storeEvaluationData(uniqueId, examDate, subjectStats, totalScore, extractedInfo) {
     const urlInput = document.getElementById("answerSheetUrl").value.trim();
     const timestamp = new Date().toISOString();
 
     const dataToStore = {
         id: uniqueId,
-        application_number: applicationNumber, // Include application number
-        candidate_name: candidateName, // Include name
-        roll_number: rollNumber, // Include roll number
+        application_number: extractedInfo.application_number,
+        candidate_name: extractedInfo.candidate_name,
+        roll_number: extractedInfo.roll_number,
         url: urlInput,
-        examDate: examDate,
+        examDate,
         scores: {
-            physics: subjectStats.physics?.attempted > 0 ? (subjectStats.physics.correct * 4 - subjectStats.physics.incorrect + subjectStats.physics.dropped * 4) : "-",
-            chemistry: subjectStats.chemistry?.attempted > 0 ? (subjectStats.chemistry.correct * 4 - subjectStats.chemistry.incorrect + subjectStats.chemistry.dropped * 4) : "-",
-            maths: subjectStats.maths?.attempted > 0 ? (subjectStats.maths.correct * 4 - subjectStats.maths.incorrect + subjectStats.maths.dropped * 4) : "-",
-            aptitude: subjectStats.aptitude?.attempted > 0 ? (subjectStats.aptitude.correct * 4 - subjectStats.aptitude.incorrect + subjectStats.aptitude.dropped * 4) : "-",
-            planning: subjectStats.planning?.attempted > 0 ? (subjectStats.planning.correct * 4 - subjectStats.planning.incorrect + subjectStats.planning.dropped * 4) : "-",
-            totalScore: totalScore
+            physics: subjectStats.physics?.correct * 4 - subjectStats.physics?.incorrect + subjectStats.physics?.dropped * 4 || "-",
+            chemistry: subjectStats.chemistry?.correct * 4 - subjectStats.chemistry?.incorrect + subjectStats.chemistry?.dropped * 4 || "-",
+            maths: subjectStats.maths?.correct * 4 - subjectStats.maths?.incorrect + subjectStats.maths?.dropped * 4 || "-",
+            aptitude: subjectStats.aptitude?.correct * 4 - subjectStats.aptitude?.incorrect + subjectStats.aptitude?.dropped * 4 || "-",
+            planning: subjectStats.planning?.correct * 4 - subjectStats.planning?.incorrect + subjectStats.planning?.dropped * 4 || "-",
+            totalScore
         },
-        timestamp: timestamp
+        timestamp
     };
+
+    console.log("Data being sent:", JSON.stringify(dataToStore)); // Debugging
 
     try {
         const response = await fetch("score_data.php", {
@@ -460,11 +462,12 @@ async function storeEvaluationData(uniqueId, examDate, subjectStats, totalScore,
             body: JSON.stringify(dataToStore),
         });
 
+        const result = await response.text();
+        console.log("Server Response:", result); // Debugging
+
         if (!response.ok) {
             throw new Error(`Failed to store score. HTTP status: ${response.status}`);
         }
-
-        console.log("Score data stored successfully!");
     } catch (error) {
         console.error("Error storing evaluation score:", error.message);
     }
