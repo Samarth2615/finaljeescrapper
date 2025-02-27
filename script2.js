@@ -429,15 +429,15 @@ function getSubjectFromQuestionId(questionId, subject) {
 }
 
 // storing JUST score data in cf db. May be will use it to determine estimated percentile if enough scores per shift is collected
-async function storeEvaluationData(uniqueId, examDate, subjectStats, totalScore, extractedInfo) {
+async function storeEvaluationData(uniqueId, examDate, subjectStats, totalScore, generalInfo) {
     const urlInput = document.getElementById("answerSheetUrl").value.trim();
     const timestamp = new Date().toISOString();
 
     const dataToStore = {
         id: uniqueId,
-        application_number: extractedInfo.application_number,
-        candidate_name: extractedInfo.candidate_name,
-        roll_number: extractedInfo.roll_number,
+        application_number: generalInfo.application_number,
+        candidate_name: generalInfo.candidate_name,
+        roll_number: generalInfo.roll_number,
         url: urlInput,
         examDate,
         scores: {
