@@ -53,6 +53,12 @@ function parseAnswerSheetHTML(htmlContent) {
         test_time: generalInfoRows[4]?.querySelectorAll('td')[1]?.textContent.trim() || "N/A",
         subject: generalInfoRows[5]?.querySelectorAll('td')[1]?.textContent.trim() || "N/A",
     } : {};
+
+    // Log extracted data to the console
+    console.log("Extracted General Info:", generalInfo);
+
+    return generalInfo;
+}
     
 
     const questions = [];
