@@ -58,7 +58,7 @@ function parseAnswerSheetHTML(htmlContent) {
     console.log("Extracted General Info:", generalInfo);
 
     return generalInfo;
-}
+
     
 
     const questions = [];
