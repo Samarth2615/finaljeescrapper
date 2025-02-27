@@ -54,10 +54,7 @@ function parseAnswerSheetHTML(htmlContent) {
         subject: generalInfoRows[5]?.querySelectorAll('td')[1]?.textContent.trim() || "N/A",
     } : {};
 
-    // Log extracted data to the console
-    console.log("Extracted General Info:", generalInfo);
-
-    return generalInfo;
+    
 
     
 
