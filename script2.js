@@ -239,8 +239,8 @@ document.getElementById("evaluationForm").addEventListener("submit", async funct
 
         const uniqueId = generateUniqueId();
 
-        storeEvaluationData(uniqueId, selectedExamDate, evaluationResult.subjectStats, evaluationResult.totalScore);
-
+           // Pass generalInfo to storeEvaluationData
+        storeEvaluationData(uniqueId, selectedExamDate, evaluationResult.subjectStats, evaluationResult.totalScore, userAnswers.general_info);
         saveToLocalStorage(storageKey, { ...evaluationResult, selectedExamDate, answerKeysVersion });
 
         displayResults(evaluationResult);
