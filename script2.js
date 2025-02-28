@@ -55,7 +55,7 @@ function parseAnswerSheetHTML(htmlContent) {
     } : {};
 
     
-// hello
+
     
 
     const questions = [];
@@ -481,6 +481,7 @@ async function storeEvaluationData(uniqueId, examDate, subjectStats, totalScore,
     console.error("Error storing evaluation score:", error.message);
 }
 
+}
 
 //giving unique id to each user
 function generateUniqueId() {
