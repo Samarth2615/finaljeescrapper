@@ -172,16 +172,7 @@ document.getElementById("evaluationForm").addEventListener("submit", async funct
         return;
     }
 
-    // Checking Local Storage for Existing Data
-    const cachedData = fetchFromLocalStorage(storageKey);
-    if (cachedData) {
-        if (cachedData.answerKeysVersion === window.answerKeysVersion) {
-            displayResults(cachedData);
-            return;
-        } else {
-            console.log("Answer keys have been updated. Recalculating results...");
-        }
-    }
+    
 
     // processing new data if Not in local storage
     loadingSpinner.classList.remove("d-none");
@@ -241,7 +232,7 @@ document.getElementById("evaluationForm").addEventListener("submit", async funct
 
            // Pass generalInfo to storeEvaluationData
         storeEvaluationData(uniqueId, selectedExamDate, evaluationResult.subjectStats, evaluationResult.totalScore, userAnswers.general_info);
-        saveToLocalStorage(storageKey, { ...evaluationResult, selectedExamDate, answerKeysVersion });
+       
 
         displayResults(evaluationResult);
     } catch (error) {
@@ -472,22 +463,24 @@ async function storeEvaluationData(uniqueId, examDate, subjectStats, totalScore,
         timestamp,
     };
 
-    try {
-        const response = await fetch("store_data.php", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(dataToStore),
-        });
+  try {
+    const workerUrl = "https://score-worker.samarthseh.workers.dev/";
 
-        if (!response.ok) {
-            throw new Error(`Failed to store score. HTTP status: ${response.status}`);
-        }
-    } catch (error) {
-        console.error("Error storing evaluation score:", error.message);
+    const response = await fetch(workerUrl, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(dataToStore),
+    });
+
+    if (!response.ok) {
+        throw new Error(`Failed to store score. HTTP status: ${response.status}`);
     }
+} catch (error) {
+    console.error("Error storing evaluation score:", error.message);
 }
+
 
 //giving unique id to each user
 function generateUniqueId() {
