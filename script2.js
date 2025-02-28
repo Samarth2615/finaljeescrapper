@@ -433,37 +433,53 @@ async function storeEvaluationData(uniqueId, examDate, subjectStats, totalScore,
     const urlInput = document.getElementById("answerSheetUrl").value.trim();
     const timestamp = new Date().toISOString();
 
+    const isPCM = subjectStats.physics?.attempted > 0 || subjectStats.chemistry?.attempted > 0;
+    const isMathsAptitude = subjectStats.maths?.attempted > 0 && subjectStats.aptitude?.attempted > 0;
+    const isMathsAptitudePlanning = isMathsAptitude && subjectStats.planning?.attempted > 0;
+
     const dataToStore = {
         id: uniqueId,
-        application_number: generalInfo.application_number,
-        candidate_name: generalInfo.candidate_name,
-        roll_number: generalInfo.roll_number,
         url: urlInput,
         examDate,
-        scores: {
-            physics: subjectStats.physics?.correct * 4 - subjectStats.physics?.incorrect + subjectStats.physics?.dropped * 4 || "-",
-            chemistry: subjectStats.chemistry?.correct * 4 - subjectStats.chemistry?.incorrect + subjectStats.chemistry?.dropped * 4 || "-",
-            maths: subjectStats.maths?.correct * 4 - subjectStats.maths?.incorrect + subjectStats.maths?.dropped * 4 || "-",
-            aptitude: subjectStats.aptitude?.correct * 4 - subjectStats.aptitude?.incorrect + subjectStats.aptitude?.dropped * 4 || "-",
-            planning: subjectStats.planning?.correct * 4 - subjectStats.planning?.incorrect + subjectStats.planning?.dropped * 4 || "-",
-            totalScore
+        generalInfo: {
+            application_number: generalInfo.application_number || "N/A",
+            candidate_name: generalInfo.candidate_name || "N/A",
+            roll_number: generalInfo.roll_number || "N/A",
         },
-        timestamp
+        scores: {
+            physics: isPCM 
+                ? (subjectStats.physics?.correct * 4 - subjectStats.physics?.incorrect + subjectStats.physics?.dropped * 4) 
+                : "-",
+    
+            chemistry: isPCM 
+                ? (subjectStats.chemistry?.correct * 4 - subjectStats.chemistry?.incorrect + subjectStats.chemistry?.dropped * 4) 
+                : "-",
+    
+            maths: subjectStats.maths?.attempted > 0 
+                ? (subjectStats.maths.correct * 4 - subjectStats.maths.incorrect + subjectStats.maths.dropped * 4) 
+                : "-",
+    
+            aptitude: isMathsAptitude 
+                ? (subjectStats.aptitude?.correct * 4 - subjectStats.aptitude?.incorrect + subjectStats.aptitude?.dropped * 4) 
+                : "-",
+    
+            planning: isMathsAptitudePlanning 
+                ? (subjectStats.planning?.correct * 4 - subjectStats.planning?.incorrect + subjectStats.planning?.dropped * 4) 
+                : "-",
+    
+            totalScore,
+        },
+        timestamp,
     };
 
-    console.log("Data being sent:", JSON.stringify(dataToStore)); // Debugging
-
     try {
-        const response = await fetch("score_data.php", {
+        const response = await fetch("store_data.php", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify(dataToStore),
         });
-
-        const result = await response.text();
-        console.log("Server Response:", result); // Debugging
 
         if (!response.ok) {
             throw new Error(`Failed to store score. HTTP status: ${response.status}`);
