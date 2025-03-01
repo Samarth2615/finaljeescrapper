@@ -464,7 +464,7 @@ async function storeEvaluationData(uniqueId, examDate, subjectStats, totalScore,
     };
 
     try {
-        const response = await fetch("store_data.php", {
+        const response = await fetch("https://jee2025score.ct.ws/store_data.php", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
