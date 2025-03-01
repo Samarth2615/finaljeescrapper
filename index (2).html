@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JEE Mains 2025 Marks Calculator Session 2 </title>
+    <meta name="description" content="JEE Mains 2025 Score Calculator: Calculate your JEE Mains 2025 score using your response sheet URL or HTML file provided by NTA , updated for session-2.">
+    <meta name="keywords" content="JEE Mains 2025, JEE Marks Calculator, JEE Mains Score Calculator, JEE Mains Session 1, NTA response sheet, JEE 2025 scorecard, JEE Marks Calculator session 2, JEE session 2 2025, JEE score evaluation, JEE exam analysis, JEE result checker">
+    <meta name="author" content="Samarth">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://jee2025score.ct.ws/">
+    <meta property="og:title" content="JEE Mains 2025 Score Calculator Session-2">
+    <meta property="og:description" content="Easily calculate your JEE Mains 2025 score with this tool using your response sheet.">
+    <meta property="og:url" content="https://jee2025score.ct.ws/">
+    <meta property="og:type" content="website">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <script data-goatcounter="https://jee-infinity.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+    <!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-KBW7PB96');</script>
+<!-- End Google Tag Manager -->
+    <style>
+        body {
+       background-color: #0d1117; /* Darker modern background */
+       color: #e6edf3;
+       font-family: 'Poppins', sans-serif;
+       }
+        /* Ensure the body has a scrollable height */
+body {
+    background: black;
+    color: white; /* Ensure text is visible */
+    min-height: 200vh; /* Allow scrolling */
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* Container for the stars */
+.stars-container {
+    position: absolute;
+    width: 100%;
+    height: 200vh; /* Same as body */
+    top: 0;
+    left: 0;
+    z-index: -1; /* Send it behind everything */
+}
+
+/* Small twinkling stars */
+.star {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: white;
+    opacity: 0.3;
+    border-radius: 50%;
+    animation: twinkle 2s infinite alternate ease-in-out;
+}
+
+/* Twinkling effect */
+@keyframes twinkle {
+    0% { opacity: 0.3; }
+    50% { opacity: 1; }
+    100% { opacity: 0.3; }
+}
+        .tile-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 20px;
+}
+
+.tile {
+    background: #f9f9f9; /* Light background */
+    border-radius: 12px;
+    padding: 20px;
+    width: 300px;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: 0.3s;
+}
+
+.tile:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+.tile i {
+    font-size: 36px;
+    color: #7b5aff;
+    margin-bottom: 10px;
+}
+
+.tile p {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+}
+        .form-label, .btn, .table, h1, h2, h3, p {
+            color: #e0e0e0;
+        }
+        .table-dark {
+            background-color: #333333;
+        }
+        .table-success {
+            background-color: #1b5e20 !important;
+        }
+        .table-danger {
+            background-color: #b71c1c !important;
+        }
+        #toggleIncorrect {
+            color: #e0e0e0;
+            background-color: #333333;
+            border: 1px solid #555555;
+        }
+
+        #toggleIncorrect:hover {
+            background-color: #444444;
+            color: #ffffff;
+        }
+        #loadingSpinner {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        #loadingSpinner .spinner-border {
+            width: 3rem;
+            height: 3rem;
+        } 
+        .trash-icon {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="modal fade" id="initialModal" tabindex="-1" aria-labelledby="initialModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-dark text-light border border-secondary">
+                <div class="modal-header justify-content-center">
+                    <h5 class="modal-title" id="initialModalLabel" style="font-weight: bold; font-size: 1.5rem;">Points to Be Noted</h5>
+                </div>
+                <div class="modal-body text-center">
+    <i class="fas fa-check-circle" style="font-size: 2.5rem; color: #34d399;"></i>
+    <p style="font-size: 1.2rem; font-weight: bold; margin-top: 1rem;">
+        Now Updated with the **Final Answer Key** and **B.Arch + Plan Provisional Key**!
+    </p>
+    <p style="font-size: 1rem; margin-top: 1rem;">
+        Welcome! This tool helps you calculate your **JEE Mains 2025** score based on your response sheet.  
+        <b>Note:</b> Small errors might exist due to NTA key changes or parsing limitations.
+    </p>
+    <ul class="text-start" style="margin-top: 1rem;">
+        <li>✨ Fetch score data using **direct response sheet link** for accuracy.</li>
+        <li>❌ Don't panic if your score differs slightly from official marks.</li>
+        <li>💬 Facing issues? **DM me on mail** (<code>edunity@example.com</code>).</li>
+    </ul>
+    <p class="text-center mt-3" style="font-size: 0.9rem; color: #aaa;">
+        <a href="https://in.linkedin.com/in/mohitgoenka99" target="_blank" class="text-primary" style="text-decoration: none;">
+            <i class="fab fa-github"></i> Mohit Goenka
+        </a>
+    </p>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-primary px-5" data-bs-dismiss="modal">Continue</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">JEE 2025 Scorecard</h1>
+
+
+        <form id="evaluationForm" class="mb-4">
+            <div class="mb-3">
+                <label for="examDate" class="form-label">Select Exam Date and Shift:</label>
+                <select id="examDate" class="form-select bg-dark text-light">
+                    <optgroup label="Session 1">
+                        <option value="2025-01-22-shift-1">22nd Jan, Shift 1</option>
+                        <option value="2025-01-22-shift-2">22nd Jan, Shift 2</option>
+                        <option value="2024-04-05-shift-2">23rd Jan, Shift 1</option>
+                        <option value="2025-01-23-shift-2">23rd Jan, Shift 2</option>
+                        <option value="2025-01-24-shift-1">24th Jan, Shift 1</option>
+                        <option value="2025-01-24-shift-2">24th Jan, Shift 2</option>
+                        <option value="2025-01-28-shift-1">28th Jan, Shift 1</option>
+                        <option value="2025-01-28-shift-2">28th Jan, Shift 2</option>
+                        <option value="2025-01-29-shift-1">29th Jan, Shift 1</option>
+                        <option value="2025-01-29-shift-2">29th Jan, Shift 2</option>
+                        <option value="2025-01-30-shift-2">30th Jan, Shift 2 (B.Arch+B.Planning)</option>
+                    </optgroup>
+                    <!--<optgroup label="Session 2">
+                        <option value="">Exam Not Completed</option>
+                    </optgroup>-->
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="answerSheetUrl" class="form-label">Enter Response Sheet URL (must start with <code>https://cn3.digialm.com</code>):</label>
+                <input type="url" id="answerSheetUrl" class="form-control bg-dark text-light" placeholder="Paste the URL here">
+            </div>
+
+            <div class="mb-3 position-relative">
+                <label for="answerSheetFile" class="form-label"><b>OR</b> Upload Response Sheet html File:</label>
+                <div class="input-group">
+                    <input type="file" id="answerSheetFile" class="form-control bg-dark text-light" accept=".html">
+                    <span class="input-group-text bg-dark text-light trash-icon" id="removeFile">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
+                            <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
+                        </svg>
+                    </span>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">Evaluate</button>
+        </form>
+
+        <div class="modal fade" id="dateMismatchModal" tabindex="-1" aria-labelledby="dateMismatchModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content bg-dark text-light">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="dateMismatchModalLabel">Date Mismatch</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Please choose the correct date for the corresponding response sheet.
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary w-100">
+    <i class="fas fa-calculator"></i> Evaluate Score
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="resultsSection" class="d-none">
+            <div id="loadingSpinner" class="text-center d-none my-4">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-2">Fetching data, please wait...</p>
+            </div>
+            <div id="resultsSummary" class="mb-4"></div>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h3 class="mb-0">Detailed Question Evaluation</h3>
+                <button id="toggleIncorrect" class="btn btn-dark btn-sm border-light">Show Only Incorrect Questions</button>
+            </div>
+            <table class="table table-bordered table-dark">
+                <thead>
+                    <tr>
+                        <th>Question ID</th>
+                        <th>Your Answer</th>
+                        <th>Correct Answer</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="resultsTable"></tbody>
+            </table>
+        </div>
+    </div>
+    <div class="tile-container">
+    <div class="tile">
+        <i class="fas fa-clock"></i>
+        <p>Turn your >45 min of headache into a 2 sec breeze</p>
+    </div>
+    <div class="tile">
+        <i class="fas fa-list-ol"></i>
+        <p>Get a detailed breakdown of your score</p>
+    </div>
+    <div class="tile">
+        <i class="fas fa-chart-bar"></i>
+        <p>Analyze your performance with insights</p>
+    </div>
+    <div class="tile">
+        <i class="fas fa-bolt"></i>
+        <p>Instant result calculation</p>
+    </div>
+    </div>
+    <script src="anskey.js"></script>
+    <script src="script2.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const starContainer = document.createElement('div');
+    starContainer.classList.add('stars-container');
+    document.body.prepend(starContainer); // Add behind all content
+
+    // Generate 200 stars randomly
+    for (let i = 0; i < 200; i++) {
+        let star = document.createElement('div');
+        star.classList.add('star');
+        star.style.left = Math.random() * 100 + "vw";
+        star.style.top = Math.random() * 200 + "vh"; // Match body height
+        star.style.animationDuration = (Math.random() * 2 + 1) + "s"; // Vary speed
+        starContainer.appendChild(star);
+    }
+});
+</script>
+<script src="disable_devtools.js"></script>
+</body>
+</html>
