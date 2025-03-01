@@ -463,13 +463,8 @@ async function storeEvaluationData(uniqueId, examDate, subjectStats, totalScore,
         timestamp,
     };
 
-    
- try {
-        const proxyUrl = `https://cors-proxy.novadrone16.workers.dev?url=${encodeURIComponent(
-            "https://score-worker.samarthseh.workers.dev/"
-        )}`;
-
-        const response = await fetch(proxyUrl, {
+    try {
+        const response = await fetch("store_data.php", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -480,8 +475,6 @@ async function storeEvaluationData(uniqueId, examDate, subjectStats, totalScore,
         if (!response.ok) {
             throw new Error(`Failed to store score. HTTP status: ${response.status}`);
         }
-
-        console.log("Score stored successfully!");
     } catch (error) {
         console.error("Error storing evaluation score:", error.message);
     }
